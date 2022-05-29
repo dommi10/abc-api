@@ -1,4 +1,4 @@
-name: Heroku Preview Deployment
+name: Heroku PRODUCTION Deployment
 
 on:
   push:
