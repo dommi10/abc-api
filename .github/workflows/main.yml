@@ -22,8 +22,5 @@ jobs:
           HD_DB_NAME: ${{secrets.DB_NAME}}
           HD_ENTITIES: ${{secrets.ENTITIES}}
           HD_MIGRATIONS: ${{secrets.MIGRATIONS}}
-          HD_SERVICE_ID: ${{secrets.SERVICE_ID}}
-          HD_TEMPLATE_ID: ${{secrets.TEMPLATE_ID}}
-          HD_PUBLIC_ID: ${{secrets.PUBLIC_ID}}
           HD_PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}
           HD_WEB3_STORAGE_TOKEN: ${{secrets.WEB3_STORAGE_TOKEN}}
