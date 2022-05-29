@@ -1,0 +1,43 @@
+import { Entity, Column, PrimaryColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entreprise } from './Entreprise.entity';
+import { Forfait } from './Forfait.entity';
+import { User } from './User.entity';
+
+@Entity()
+export class Abonnement {
+  @PrimaryColumn()
+  id!: string;
+
+  @Column({ type: 'date' })
+  dateDebut!: Date;
+
+  @Column({ type: 'date' })
+  dateFin!: Date;
+
+  @Column({ type: 'bigint', default: () => '0' })
+  nombre!: number;
+
+  @Column({ type: 'float', default: () => '0' })
+  frais!: number;
+
+  @Column({ type: 'int', default: 0 })
+  statut!: number;
+
+  @Column({ type: 'text' })
+  comment!: string;
+
+  @ManyToOne(() => User, (User) => User.abonnements)
+  savedBy: User | undefined;
+
+  @ManyToOne(() => User, (User) => User.activateAbonnements)
+  activateBy: User | undefined;
+
+  @ManyToOne(() => Entreprise, (entreprise) => entreprise.abonnements)
+  entreprise: Entreprise | undefined;
+
+  @OneToMany(() => Forfait, (abonnements) => abonnements.abonnements)
+  forfaits: Forfait[] | undefined;
+
+  @Column({ type: 'timestamp', default: () => 'NOW()' })
+  createdAt: Date | undefined;
+}

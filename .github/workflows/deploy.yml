@@ -1,0 +1,29 @@
+name: Heroku Preview Deployment
+
+on:
+  push:
+    branches: ['develop']
+
+jobs:
+  preview-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: ${{secrets.HEROKU_DEV_APP_NAME}}
+        env:
+          HD_DB_HOST: ${{secrets.DB_HOST}}
+          HD_DB_PORT: ${{secrets.DB_PORT}}
+          HD_DB_USERNAME: ${{secrets.DB_USERNAME}}
+          HD_DB_PASSWORD: ${{secrets.DB_PASSWORD}}
+          HD_DB_NAME: ${{secrets.DB_NAME}}
+          HD_ENTITIES: ${{secrets.ENTITIES}}
+          HD_MIGRATIONS: ${{secrets.MIGRATIONS}}
+          HD_SERVICE_ID: ${{secrets.SERVICE_ID}}
+          HD_TEMPLATE_ID: ${{secrets.TEMPLATE_ID}}
+          HD_PUBLIC_ID: ${{secrets.PUBLIC_ID}}
+          HD_PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}
+          HD_WEB3_STORAGE_TOKEN: ${{secrets.WEB3_STORAGE_TOKEN}}
