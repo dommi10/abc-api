@@ -265,8 +265,6 @@ export async function sendSMS(
       },
     });
 
-    console.log(smsSender);
-
     if (smsSender.data && smsSender.data.toString().includes('OK')) return true;
     return false;
   } catch (error) {
