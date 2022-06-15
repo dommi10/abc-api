@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Abonnement } from './Abonnement.entity';
 import { User } from './User.entity';
 
 @Entity()
@@ -26,4 +27,7 @@ export class Offres {
 
   @Column({ type: 'timestamp', default: () => 'NOW()' })
   createdAt: Date | undefined;
+
+  @OneToMany(() => Abonnement, (campagnes) => campagnes.offre)
+  abonnements: Abonnement[] | undefined;
 }
