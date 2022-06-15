@@ -3,10 +3,9 @@ import cors from 'cors';
 import * as bcryptjs from 'bcryptjs';
 import fileUpload from 'express-fileupload';
 import { AppDataSource } from './data-source';
-import { userRoutes, tokenRoutes } from './routes';
+import { userRoutes, tokenRoutes, offreRoutes } from './routes';
 import {
   sendEmail,
-  sendSMS,
   validateAsEmail,
   validateAsPhoneNumber,
   validateAsString,
@@ -31,6 +30,7 @@ AppDataSource.initialize()
     // register express routes from defined application routes
     app.use('/user', userRoutes.default);
     app.use('/token', tokenRoutes.default);
+    app.use('/offres', offreRoutes.default);
 
     // setup express app here
     // ...
@@ -71,11 +71,6 @@ AppDataSource.initialize()
       user.comment = '';
       user.isSuper = 1;
       user.statut = 1;
-
-      // await sendSMS(
-      //   '243971955445',
-      //   `Bonjour,Si vous recevez ce message, veillez me repondre sur whatsapp merci!`,
-      // );
 
       if (
         !(await AppDataSource.getRepository(User).findOneBy({
