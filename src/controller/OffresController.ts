@@ -1,25 +1,14 @@
 import { Request, Response } from 'express';
-import * as bcryptjs from 'bcryptjs';
-import dayjs from 'dayjs';
 import { AppDataSource } from '../data-source';
 import { Offres } from '../entity/Offres.entity';
 import { niveau as niveauType, User } from '../entity/User.entity';
 import {
-  EXPIRE_ACCESS_TOKEN,
-  EXPIRE_DAILY_REFRESH_TOKEN,
-  EXPIRE_REFRESH_TOKEN,
-  generateRandomString,
   getComment,
-  sendSMS,
-  signToken,
   validateAsDigit,
-  validateAsPassword,
   validateAsString,
   validateAsStringForQuery,
 } from '../utils';
 import { IRequest } from '../helpers';
-import { saveRefreshToken } from './TokenController';
-import { Abonnement } from '../entity/Abonnement.entity';
 
 export async function all(req: Request, res: Response) {
   try {
@@ -68,7 +57,7 @@ export async function save(req: IRequest, res: Response) {
     const { designation, nombre, frais } = req.body;
     const { user: loggedUser } = req;
 
-    if (!loggedUser || loggedUser.niveau !== 'ADMIN')
+    if (!loggedUser || loggedUser.niveau !== niveauType.ADMIN)
       return res.json({ message: 'acces denied' });
 
     if (!designation || !validateAsString(designation))

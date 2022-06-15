@@ -3,7 +3,12 @@ import cors from 'cors';
 import * as bcryptjs from 'bcryptjs';
 import fileUpload from 'express-fileupload';
 import { AppDataSource } from './data-source';
-import { userRoutes, tokenRoutes, offreRoutes } from './routes';
+import {
+  userRoutes,
+  tokenRoutes,
+  offreRoutes,
+  entrepriseRoutes,
+} from './routes';
 import {
   sendEmail,
   validateAsEmail,
@@ -31,6 +36,7 @@ AppDataSource.initialize()
     app.use('/user', userRoutes.default);
     app.use('/token', tokenRoutes.default);
     app.use('/offres', offreRoutes.default);
+    app.use('/entreprise', entrepriseRoutes.default);
 
     // setup express app here
     // ...

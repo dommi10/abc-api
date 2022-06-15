@@ -16,9 +16,10 @@ import {
   validateAsString,
   validateAsStringForQuery,
 } from '../utils';
-import { IRequest } from '../helpers';
+import { IRequest, UserType } from '../helpers';
 import { saveRefreshToken } from './TokenController';
 import { Abonnement } from '../entity/Abonnement.entity';
+import { QueryRunner } from 'typeorm';
 
 export async function all(req: Request, res: Response) {
   try {
@@ -85,6 +86,51 @@ export async function me(req: IRequest, res: Response) {
   } catch (error) {
     console.log(error);
     return res.json({ message: 'something went wrong try again' });
+  }
+}
+
+export async function saveUserByValues({
+  username,
+  loggedUser,
+  niveau,
+  comment,
+  queryRunner,
+}: {
+  username: string;
+  niveau: niveauType;
+  comment: string;
+  loggedUser: UserType;
+  queryRunner: QueryRunner;
+}): Promise<string | { username: string; password: string }> {
+  try {
+    if (!loggedUser || loggedUser.niveau !== 'ADMIN') return 'acces denied';
+
+    if (!username || !validateAsString(username)) return 'username invalid';
+
+    if (!niveau || !Object.values(niveauType).includes(niveau))
+      return 'invalid niveau';
+
+    if (
+      await AppDataSource.getRepository(User).findOneBy({
+        username: username.toLocaleLowerCase(),
+      })
+    )
+      return 'user already exists';
+
+    const password = generateRandomString(8);
+    const user = new User();
+    user.id = Date.now().toString();
+    user.username = username.toLocaleLowerCase();
+    user.password = bcryptjs.hashSync(password);
+    user.niveau = niveau;
+    user.comment = comment;
+
+    await queryRunner.manager.save(user);
+
+    return { username, password };
+  } catch (error) {
+    console.log(error);
+    return 'something went wrong try again';
   }
 }
 
