@@ -182,7 +182,9 @@ export async function save(req: IRequest, res: Response) {
       .of(entreprise)
       .set(connectedUser);
 
-    return res.json({ entreprise });
+    await queryRunner.commitTransaction();
+
+    return res.json({ entreprise, user: saveUser });
   } catch (error) {
     console.log(error);
     await queryRunner.rollbackTransaction();
