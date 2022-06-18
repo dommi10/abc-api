@@ -15,6 +15,7 @@ import {
 import { IRequest } from '../helpers';
 import { saveUserByValues } from './UserController';
 import { Like } from 'typeorm';
+import { Acces } from '../entity/Access.entity';
 
 export async function all(req: Request, res: Response) {
   try {
@@ -181,6 +182,12 @@ export async function save(req: IRequest, res: Response) {
       .relation(Entreprise, 'user')
       .of(entreprise)
       .set(connectedUser);
+
+    await queryRunner.manager
+      .createQueryBuilder()
+      .relation(Acces, 'entreprise')
+      .of(saveUser.acces)
+      .set(entreprise);
 
     await queryRunner.commitTransaction();
 

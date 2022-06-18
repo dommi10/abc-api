@@ -20,6 +20,7 @@ import { IRequest, UserType } from '../helpers';
 import { saveRefreshToken } from './TokenController';
 import { Abonnement } from '../entity/Abonnement.entity';
 import { QueryRunner } from 'typeorm';
+import { Acces } from '../entity/Access.entity';
 
 export async function all(req: Request, res: Response) {
   try {
@@ -101,7 +102,7 @@ export async function saveUserByValues({
   comment: string;
   loggedUser: UserType;
   queryRunner: QueryRunner;
-}): Promise<string | { username: string; password: string }> {
+}): Promise<string | { username: string; password: string; acces: Acces }> {
   try {
     if (!loggedUser || loggedUser.niveau !== 'ADMIN') return 'acces denied';
 
@@ -127,7 +128,29 @@ export async function saveUserByValues({
 
     await queryRunner.manager.save(user);
 
-    return { username, password };
+    const acces = new Acces();
+    acces.id = Date.now().toString();
+    acces.comment = comment;
+
+    await queryRunner.manager.save(acces);
+
+    const connectedUser = await AppDataSource.getRepository(User).findOneBy({
+      id: loggedUser.id,
+    });
+
+    await queryRunner.manager
+      .createQueryBuilder()
+      .relation(Acces, 'user')
+      .of(acces)
+      .set(user);
+
+    await queryRunner.manager
+      .createQueryBuilder()
+      .relation(Acces, 'savedBy')
+      .of(acces)
+      .set(connectedUser);
+
+    return { username, password, acces };
   } catch (error) {
     console.log(error);
     return 'something went wrong try again';
