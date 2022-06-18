@@ -23,7 +23,7 @@ export class Forfait {
   @ManyToOne(() => Abonnement, (abonnements) => abonnements.forfaits)
   abonnements: Abonnement | undefined;
 
-  @ManyToOne(() => User, (User) => User.forfaits)
+  @ManyToOne(() => User, (user) => user.forfaits)
   savedBy: User | undefined;
 
   @OneToMany(() => Transactions, (transaction) => transaction.forfait)

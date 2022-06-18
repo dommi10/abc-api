@@ -15,22 +15,16 @@ export class Abonnement {
   @Column({ type: 'date' })
   dateFin!: Date;
 
-  @Column({ type: 'bigint', default: () => '0' })
-  nombre!: number;
-
-  @Column({ type: 'float', default: () => '0' })
-  frais!: number;
-
   @Column({ type: 'int', default: 0 })
   statut!: number;
 
   @Column({ type: 'text' })
   comment!: string;
 
-  @ManyToOne(() => User, (User) => User.abonnements)
+  @ManyToOne(() => User, (user) => user.abonnements)
   savedBy: User | undefined;
 
-  @ManyToOne(() => User, (User) => User.activateAbonnements)
+  @ManyToOne(() => User, (user) => user.activateAbonnements)
   activateBy: User | undefined;
 
   @ManyToOne(() => Entreprise, (entreprise) => entreprise.abonnements)

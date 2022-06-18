@@ -11,6 +11,7 @@ export enum niveau {
   ADMIN = 'ADMIN',
   USER = 'USER',
   VALIDATEUR = 'VALIDATEUR',
+  AGENT = 'AGENT',
 }
 
 @Entity()

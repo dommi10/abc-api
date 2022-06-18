@@ -84,7 +84,10 @@ export async function save(req: IRequest, res: Response) {
     const { user: loggedUser } = req;
 
     if (!loggedUser || loggedUser.niveau !== niveauType.ADMIN)
-      return res.json({ message: 'acces denied' });
+      return res.json({
+        message:
+          "vous ne disposez pas assez d'autorisation pour effectuer cette action",
+      });
 
     if (!nom || !validateAsString(nom))
       return res.json({ message: 'nom invalid' });
@@ -222,7 +225,10 @@ export async function update(req: IRequest, res: Response) {
     const { user } = req;
 
     if (!user || user.niveau !== niveauType.ADMIN)
-      return res.json({ message: 'acces denied' });
+      return res.json({
+        message:
+          "vous ne disposez pas assez d'autorisation pour effectuer cette action",
+      });
 
     if (!id || !validateAsDigit(id)) return res.json({ message: 'id invalid' });
 

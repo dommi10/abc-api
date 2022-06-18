@@ -9,6 +9,7 @@ import {
   offreRoutes,
   entrepriseRoutes,
   campagneRoutes,
+  abonnementRoutes,
 } from './routes';
 import {
   sendEmail,
@@ -39,6 +40,7 @@ AppDataSource.initialize()
     app.use('/offres', offreRoutes.default);
     app.use('/entreprise', entrepriseRoutes.default);
     app.use('/campagne', campagneRoutes.default);
+    app.use('/abonnement', abonnementRoutes.default);
 
     // setup express app here
     // ...

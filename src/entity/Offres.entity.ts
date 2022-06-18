@@ -22,7 +22,7 @@ export class Offres {
   @Column({ type: 'text' })
   comment!: string;
 
-  @ManyToOne(() => User, (User) => User.offres)
+  @ManyToOne(() => User, (user) => user.offres)
   savedBy: User | undefined;
 
   @Column({ type: 'timestamp', default: () => 'NOW()' })

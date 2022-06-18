@@ -104,7 +104,8 @@ export async function saveUserByValues({
   queryRunner: QueryRunner;
 }): Promise<string | { username: string; password: string; acces: Acces }> {
   try {
-    if (!loggedUser || loggedUser.niveau !== 'ADMIN') return 'acces denied';
+    if (!loggedUser || loggedUser.niveau !== 'ADMIN')
+      return "vous ne disposez pas assez d'autorisation pour effectuer cette action";
 
     if (!username || !validateAsString(username)) return 'username invalid';
 
@@ -163,7 +164,10 @@ export async function save(req: IRequest, res: Response) {
     const { user: loggedUser } = req;
 
     if (!loggedUser || loggedUser.niveau !== 'ADMIN')
-      return res.json({ message: 'acces denied' });
+      return res.json({
+        message:
+          "vous ne disposez pas assez d'autorisation pour effectuer cette action",
+      });
 
     if (!username || !validateAsString(username))
       return res.json({ message: 'username invalid' });
@@ -202,7 +206,10 @@ export async function desactivate(req: IRequest, res: Response) {
     const { id } = req.params;
 
     if (!user || user.niveau !== 'ADMIN')
-      return res.json({ message: 'acces denied' });
+      return res.json({
+        message:
+          "vous ne disposez pas assez d'autorisation pour effectuer cette action",
+      });
 
     if (!id || !validateAsDigit(id)) return res.json({ message: 'id invalid' });
 
@@ -224,7 +231,10 @@ export async function activate(req: IRequest, res: Response) {
     const { id } = req.params;
 
     if (!user || user.niveau !== 'ADMIN')
-      return res.json({ message: 'acces denied' });
+      return res.json({
+        message:
+          "vous ne disposez pas assez d'autorisation pour effectuer cette action",
+      });
 
     if (!id || !validateAsDigit(id)) return res.json({ message: 'id invalid' });
 
@@ -247,7 +257,10 @@ export async function updateNiveau(req: IRequest, res: Response) {
     const { niveau } = req.body;
 
     if (!user || user.niveau !== 'ADMIN')
-      return res.json({ message: 'acces denied' });
+      return res.json({
+        message:
+          "vous ne disposez pas assez d'autorisation pour effectuer cette action",
+      });
 
     if (!id || !validateAsDigit(id)) return res.json({ message: 'id invalid' });
 
@@ -273,7 +286,10 @@ export async function changePassword(req: IRequest, res: Response) {
     const { id } = req.params;
 
     if (!user || user.niveau !== 'ADMIN')
-      return res.json({ message: 'acces denied' });
+      return res.json({
+        message:
+          "vous ne disposez pas assez d'autorisation pour effectuer cette action",
+      });
 
     if (!id || !validateAsDigit(id)) return res.json({ message: 'id invalid' });
 
