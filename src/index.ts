@@ -8,6 +8,7 @@ import {
   tokenRoutes,
   offreRoutes,
   entrepriseRoutes,
+  campagneRoutes,
 } from './routes';
 import {
   sendEmail,
@@ -37,6 +38,7 @@ AppDataSource.initialize()
     app.use('/token', tokenRoutes.default);
     app.use('/offres', offreRoutes.default);
     app.use('/entreprise', entrepriseRoutes.default);
+    app.use('/campagne', campagneRoutes.default);
 
     // setup express app here
     // ...

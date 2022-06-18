@@ -17,10 +17,10 @@ export class Campagne {
   @Column({ type: 'text' })
   comment!: string;
 
-  @ManyToOne(() => Entreprise, (Entreprise) => Entreprise.campagnes)
+  @ManyToOne(() => Entreprise, (entreprise) => entreprise.campagnes)
   entreprise: Entreprise | undefined;
 
-  @ManyToOne(() => User, (User) => User.campagnes)
+  @ManyToOne(() => User, (user) => user.campagnes)
   savedBy: User | undefined;
 
   @OneToMany(() => Transactions, (transaction) => transaction.campagne)
