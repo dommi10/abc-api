@@ -24,3 +24,5 @@ jobs:
           HD_MIGRATIONS: ${{secrets.MIGRATIONS}}
           HD_PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}
           HD_WEB3_STORAGE_TOKEN: ${{secrets.WEB3_STORAGE_TOKEN}}
+          HD_CLICK_PASSWORD: ${{secrets.CLICK_PASSWORD}}
+          HD_CLICK_USERNAME: ${{secrets.CLICK_USERNAME}}
