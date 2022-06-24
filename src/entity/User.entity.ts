@@ -1,4 +1,11 @@
-import { Entity, Column, PrimaryColumn, OneToMany, OneToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryColumn,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 import { Abonnement } from './Abonnement.entity';
 import { Acces } from './Access.entity';
 import { Campagne } from './Campagne.entity';
@@ -38,6 +45,7 @@ export class User {
   comment!: string;
 
   @OneToOne(() => Acces, (access) => access.user)
+  @JoinColumn()
   access: Acces | undefined;
 
   @OneToMany(() => Acces, (access) => access.savedBy)

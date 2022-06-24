@@ -434,7 +434,7 @@ export async function login(req: Request, res: Response) {
     return res.json({ token, refreshToken });
   } catch (error) {
     console.log(error);
-    return res.json({ welcome: 'something went wrong please try again' });
+    return res.json({ message: 'something went wrong please try again' });
   }
 }
 
