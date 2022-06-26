@@ -73,7 +73,7 @@ export async function save(req: IRequest, res: Response) {
       return res.json({ message: 'frais invalide' });
 
     await AppDataSource.getRepository(Offres).update(
-      { statut: 1 },
+      { designation: (designation as string).toLocaleLowerCase() },
       { statut: 0 },
     );
 
