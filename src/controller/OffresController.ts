@@ -43,7 +43,7 @@ export async function one(req: Request, res: Response) {
 
     const offre = await AppDataSource.getRepository(Offres).findOneBy({ id });
 
-    if (!offre) return res.json({ message: 'user not exist' });
+    if (!offre) return res.json({ message: 'offre not exist' });
 
     return res.json({ offre });
   } catch (error) {
@@ -70,7 +70,7 @@ export async function save(req: IRequest, res: Response) {
       return res.json({ message: 'nombre incorrect' });
 
     if (!frais || !validateAsDigit(frais))
-      return res.json({ message: 'frais niveau' });
+      return res.json({ message: 'frais invalide' });
 
     await AppDataSource.getRepository(Offres).update(
       { statut: 1 },
@@ -91,7 +91,7 @@ export async function save(req: IRequest, res: Response) {
     });
 
     await AppDataSource.createQueryBuilder()
-      .relation(Offres, 'user')
+      .relation(Offres, 'savedBy')
       .of(offre)
       .set(connectedUser);
 
@@ -146,7 +146,7 @@ export async function update(req: IRequest, res: Response) {
     });
 
     await AppDataSource.createQueryBuilder()
-      .relation(Offres, 'user')
+      .relation(Offres, 'savedBy')
       .of(offre)
       .set(connectedUser);
 
