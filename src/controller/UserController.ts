@@ -471,7 +471,7 @@ export async function searchUser(req: Request, res: Response) {
         .orderBy('createdAt', 'DESC')
         .getMany();
 
-      return res.json({ user: users, total });
+      return res.json({ users, total });
     }
     return res.json({ message: 'invalid query' });
   } catch (error) {
