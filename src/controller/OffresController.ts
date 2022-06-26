@@ -23,12 +23,12 @@ export async function all(req: Request, res: Response) {
       return res.json({ message: 'params invalid' });
 
     const total = await AppDataSource.getRepository(Offres).count();
-    const users = await AppDataSource.getRepository(Offres).find({
+    const offres = await AppDataSource.getRepository(Offres).find({
       skip: Number.parseInt(skip as string),
       take: Number.parseInt(take as string),
       order: { createdAt: 'DESC' },
     });
-    return res.json({ users, total });
+    return res.json({ offres, total });
   } catch (error) {
     console.log(error);
     return res.json({ message: 'Something went wrong, please try again' });
@@ -180,7 +180,7 @@ export async function searchOffre(req: Request, res: Response) {
         .where('designation like :query', { query: `%${query}%` })
         .getCount();
 
-      const users = await AppDataSource.getRepository(Offres)
+      const offres = await AppDataSource.getRepository(Offres)
         .createQueryBuilder('user')
         .where('designation like :query', { query: `%${query}%` })
         .take(Number.parseFloat(take as string))
@@ -188,7 +188,7 @@ export async function searchOffre(req: Request, res: Response) {
         .orderBy('createdAt', 'DESC')
         .getMany();
 
-      return res.json({ user: users, total });
+      return res.json({ offres, total });
     }
     return res.json({ message: 'invalid query' });
   } catch (error) {
