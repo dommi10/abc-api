@@ -182,7 +182,7 @@ export async function save(req: IRequest, res: Response) {
 
     await queryRunner.manager
       .createQueryBuilder()
-      .relation(Entreprise, 'user')
+      .relation(Entreprise, 'savedBy')
       .of(entreprise)
       .set(connectedUser);
 
@@ -299,7 +299,7 @@ export async function update(req: IRequest, res: Response) {
     });
 
     await AppDataSource.createQueryBuilder()
-      .relation(Entreprise, 'user')
+      .relation(Entreprise, 'savedBy')
       .of(entreprise)
       .set(connectedUser);
 
