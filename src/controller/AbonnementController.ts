@@ -102,10 +102,21 @@ export async function save(req: IRequest, res: Response) {
 
     if (!entreprise) return res.json({ message: 'entreprise indisponible' });
 
+    const abo = await AppDataSource.getRepository(Abonnement).findOne({
+      where: {
+        entreprise: {
+          id: entrepriseId as string,
+        },
+      },
+      order: { createdAt: 'DESC' },
+    });
+
     const abonnements = new Abonnement();
     abonnements.id = Date.now().toString();
     abonnements.dateDebut = new Date(dayjs().format());
-    abonnements.dateFin = new Date(dayjs().add(30, 'day').format());
+    abonnements.dateFin = abo
+      ? new Date(dayjs(abo.dateFin).add(30, 'day').format())
+      : new Date(dayjs().add(30, 'day').format());
     abonnements.comment = getComment(req);
     await queryRunner.manager.save(abonnements);
 
