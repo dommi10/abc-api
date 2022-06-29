@@ -9,6 +9,7 @@ import {
   validateAsStringForQuery,
 } from '../utils';
 import { IRequest } from '../helpers';
+import { LessThan } from 'typeorm';
 
 export async function all(req: Request, res: Response) {
   try {
@@ -28,13 +29,13 @@ export async function all(req: Request, res: Response) {
       where:
         Number.parseFloat(statut as string) === -1
           ? { statut: Number.parseFloat(statut as string) }
-          : {},
+          : { statut: LessThan(2) },
     });
     const offres = await AppDataSource.getRepository(Offres).find({
       where:
         Number.parseFloat(statut as string) === -1
           ? { statut: Number.parseFloat(statut as string) }
-          : {},
+          : { statut: LessThan(2) },
       skip: Number.parseInt(skip as string),
       take: Number.parseInt(take as string),
       order: { createdAt: 'DESC' },
