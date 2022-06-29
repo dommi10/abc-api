@@ -144,7 +144,7 @@ export async function save(req: IRequest, res: Response) {
 
     const user = await AppDataSource.getRepository(User).findOne({
       where: {
-        username: Like('%user-'),
+        username: Like('user-%'),
       },
       order: { createdAt: 'DESC' },
     });
@@ -154,7 +154,9 @@ export async function save(req: IRequest, res: Response) {
     if (user) {
       const order =
         Number.parseInt(
-          user.username.substring(user.username.lastIndexOf('-') + 1),
+          user.username
+            .toString()
+            .substring(user.username.toString().lastIndexOf('-') + 1),
         ) + 1;
 
       if (order < 10) username = `user-000${order}`;
@@ -331,7 +333,8 @@ export async function searchEntreprise(req: Request, res: Response) {
       const total = await AppDataSource.getRepository(Entreprise)
         .createQueryBuilder('user')
         .where(
-          'nom like :query or rccm like :query or idnat like :query or senderName like :query or ville like :query or province like :query ',{ query: `%${query}%` },
+          'nom like :query or rccm like :query or idnat like :query or senderName like :query or ville like :query or province like :query ',
+          { query: `%${query}%` },
         )
         .getCount();
 
@@ -346,7 +349,7 @@ export async function searchEntreprise(req: Request, res: Response) {
         .orderBy('createdAt', 'DESC')
         .getMany();
 
-      return res.json({  entreprises, total });
+      return res.json({ entreprises, total });
     }
     return res.json({ message: 'invalid query' });
   } catch (error) {
