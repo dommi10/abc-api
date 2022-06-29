@@ -31,7 +31,7 @@ export async function all(req: Request, res: Response) {
         },
       },
     });
-    const users = await AppDataSource.getRepository(Campagne).find({
+    const campanges = await AppDataSource.getRepository(Campagne).find({
       where: {
         entreprise: {
           id: entrepriseId as string,
@@ -41,7 +41,7 @@ export async function all(req: Request, res: Response) {
       take: Number.parseInt(take as string),
       order: { createdAt: 'DESC' },
     });
-    return res.json({ users, total });
+    return res.json({ campanges, total });
   } catch (error) {
     console.log(error);
     return res.json({ message: 'Something went wrong, please try again' });
@@ -69,7 +69,7 @@ export async function one(req: Request, res: Response) {
 
 export async function save(req: IRequest, res: Response) {
   try {
-    const { title, message } = req.body;
+    const { title, message, entrepriseId } = req.body;
     const { user } = req;
 
     if (
@@ -80,6 +80,9 @@ export async function save(req: IRequest, res: Response) {
         message:
           "vous ne disposez pas assez d'autorisation pour effectuer cette action",
       });
+
+    if (!entrepriseId || !validateAsDigit(entrepriseId))
+      return res.json({ message: 'entreprise invalid' });
 
     if (!title || !validateAsString(title))
       return res.json({ message: 'title invalid' });
@@ -113,6 +116,15 @@ export async function save(req: IRequest, res: Response) {
       .relation(Campagne, 'savedBy')
       .of(campagne)
       .set(connectedUser);
+
+    const entreprise = await AppDataSource.getRepository(Campagne).findOneBy({
+      id: entrepriseId,
+    });
+
+    await AppDataSource.createQueryBuilder()
+      .relation(Campagne, 'entreprise')
+      .of(campagne)
+      .set(entreprise);
 
     return res.json({ campagne });
   } catch (error) {
@@ -204,7 +216,7 @@ export async function searchCampagne(req: Request, res: Response) {
         )
         .getCount();
 
-      const users = await AppDataSource.getRepository(Campagne)
+      const campanges = await AppDataSource.getRepository(Campagne)
         .createQueryBuilder('campagne')
         .where(
           '(title like :query or message like :query ) and entrepriseId = :entrepriseId',
@@ -215,7 +227,7 @@ export async function searchCampagne(req: Request, res: Response) {
         .orderBy('createdAt', 'DESC')
         .getMany();
 
-      return res.json({ campagne: users, total });
+      return res.json({ campanges, total });
     }
     return res.json({ message: 'invalid query' });
   } catch (error) {
