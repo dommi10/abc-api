@@ -12,18 +12,29 @@ import { IRequest } from '../helpers';
 
 export async function all(req: Request, res: Response) {
   try {
-    const { skip, take } = req.query;
+    const { skip, take, statut } = req.query;
 
     if (
       !skip ||
       !validateAsDigit(skip as string) ||
       !take ||
-      !validateAsDigit(take as string)
+      !validateAsDigit(take as string) ||
+      !statut ||
+      !validateAsDigit(statut as string)
     )
       return res.json({ message: 'params invalid' });
 
-    const total = await AppDataSource.getRepository(Offres).count();
+    const total = await AppDataSource.getRepository(Offres).count({
+      where:
+        Number.parseFloat(statut as string) === -1
+          ? { statut: Number.parseFloat(statut as string) }
+          : {},
+    });
     const offres = await AppDataSource.getRepository(Offres).find({
+      where:
+        Number.parseFloat(statut as string) === -1
+          ? { statut: Number.parseFloat(statut as string) }
+          : {},
       skip: Number.parseInt(skip as string),
       take: Number.parseInt(take as string),
       order: { createdAt: 'DESC' },
@@ -159,13 +170,15 @@ export async function update(req: IRequest, res: Response) {
 
 export async function searchOffre(req: Request, res: Response) {
   try {
-    const { skip, take, query } = req.query;
+    const { skip, take, query, statut } = req.query;
 
     if (
       !skip ||
       !validateAsDigit(skip as string) ||
       !take ||
-      !validateAsDigit(take as string)
+      !validateAsDigit(take as string) ||
+      !statut ||
+      !validateAsDigit(statut as string)
     )
       return res.json({ message: 'params invalid' });
 
@@ -177,12 +190,36 @@ export async function searchOffre(req: Request, res: Response) {
     if (query && validateAsStringForQuery('' + query)) {
       const total = await AppDataSource.getRepository(Offres)
         .createQueryBuilder('user')
-        .where('designation like :query', { query: `%${query}%` })
+        .where(
+          Number.parseFloat(statut as string) === -1
+            ? 'designation like :query'
+            : 'designation like :query And statut = :statut',
+          Number.parseFloat(statut as string) === -1
+            ? {
+                query: `%${query}%`,
+              }
+            : {
+                query: `%${query}%`,
+                statut: Number.parseFloat(statut as string),
+              },
+        )
         .getCount();
 
       const offres = await AppDataSource.getRepository(Offres)
         .createQueryBuilder('user')
-        .where('designation like :query', { query: `%${query}%` })
+        .where(
+          Number.parseFloat(statut as string) === -1
+            ? 'designation like :query'
+            : 'designation like :query And statut = :statut',
+          Number.parseFloat(statut as string) === -1
+            ? {
+                query: `%${query}%`,
+              }
+            : {
+                query: `%${query}%`,
+                statut: Number.parseFloat(statut as string),
+              },
+        )
         .take(Number.parseFloat(take as string))
         .skip(Number.parseFloat(skip as string))
         .orderBy('createdAt', 'DESC')
