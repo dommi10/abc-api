@@ -170,7 +170,11 @@ export async function activate(req: IRequest, res: Response) {
 
     const { user } = req;
 
-    if (!user || user.niveau !== niveauType.VALIDATEUR)
+    if (
+      !user ||
+      (user.niveau !== niveauType.VALIDATEUR &&
+        user.niveau !== niveauType.ADMIN)
+    )
       return res.json({
         message:
           "vous ne disposez pas assez d'autorisation pour effectuer cette action",
