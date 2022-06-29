@@ -27,13 +27,13 @@ export async function all(req: Request, res: Response) {
 
     const total = await AppDataSource.getRepository(Offres).count({
       where:
-        Number.parseFloat(statut as string) === -1
+        Number.parseFloat(statut as string) !== -1
           ? { statut: Number.parseFloat(statut as string) }
           : { statut: LessThan(2) },
     });
     const offres = await AppDataSource.getRepository(Offres).find({
       where:
-        Number.parseFloat(statut as string) === -1
+        Number.parseFloat(statut as string) !== -1
           ? { statut: Number.parseFloat(statut as string) }
           : { statut: LessThan(2) },
       skip: Number.parseInt(skip as string),
