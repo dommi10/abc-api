@@ -107,6 +107,7 @@ export async function save(req: IRequest, res: Response) {
         entreprise: {
           id: entrepriseId as string,
         },
+        statut: 1,
       },
       order: { createdAt: 'DESC' },
     });
@@ -115,7 +116,11 @@ export async function save(req: IRequest, res: Response) {
     abonnements.id = Date.now().toString();
     abonnements.dateDebut = new Date(dayjs().format());
     abonnements.dateFin = abo
-      ? new Date(dayjs(abo.dateFin).add(30, 'day').format())
+      ? new Date(
+          dayjs(abo.dateFin).isBefore(dayjs(), 'day')
+            ? dayjs().add(30, 'day').format()
+            : dayjs(abo.dateFin).add(30, 'day').format(),
+        )
       : new Date(dayjs().add(30, 'day').format());
     abonnements.comment = getComment(req);
     await queryRunner.manager.save(abonnements);
