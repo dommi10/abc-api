@@ -331,15 +331,14 @@ export async function searchEntreprise(req: Request, res: Response) {
       const total = await AppDataSource.getRepository(Entreprise)
         .createQueryBuilder('user')
         .where(
-          'nom like :query and rccm like :query and idnat like :query and senderName like :query and ville like :query and province like :query ',
-          { query: `%${query}%` },
+          'nom like :query or rccm like :query or idnat like :query or senderName like :query or ville like :query or province like :query ',{ query: `%${query}%` },
         )
         .getCount();
 
       const entreprises = await AppDataSource.getRepository(Entreprise)
         .createQueryBuilder('user')
         .where(
-          'nom like :query and rccm like :query and idnat like :query and senderName like :query and ville like :query and province like :query ',
+          'nom like :query or rccm like :query or idnat like :query or senderName like :query or ville like :query or province like :query ',
           { query: `%${query}%` },
         )
         .take(Number.parseFloat(take as string))
@@ -347,7 +346,7 @@ export async function searchEntreprise(req: Request, res: Response) {
         .orderBy('createdAt', 'DESC')
         .getMany();
 
-      return res.json({ user: entreprises, total });
+      return res.json({  entreprises, total });
     }
     return res.json({ message: 'invalid query' });
   } catch (error) {

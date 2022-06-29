@@ -21,25 +21,12 @@ export async function all(req: Request, res: Response) {
       !skip ||
       !validateAsDigit(skip as string) ||
       !take ||
-      !validateAsDigit(take as string) ||
-      !entrepriseId ||
-      !validateAsDigit(entrepriseId as string)
+      !validateAsDigit(take as string)
     )
       return res.json({ message: 'params invalid' });
 
-    const total = await AppDataSource.getRepository(Abonnement).count({
-      where: {
-        entreprise: {
-          id: entrepriseId as string,
-        },
-      },
-    });
+    const total = await AppDataSource.getRepository(Abonnement).count({});
     const abonnements = await AppDataSource.getRepository(Abonnement).find({
-      where: {
-        entreprise: {
-          id: entrepriseId as string,
-        },
-      },
       skip: Number.parseInt(skip as string),
       take: Number.parseInt(take as string),
       relations: {
@@ -250,15 +237,13 @@ export async function activate(req: IRequest, res: Response) {
 
 export async function searchAbonnement(req: Request, res: Response) {
   try {
-    const { skip, take, query, entrepriseId } = req.query;
+    const { skip, take, query } = req.query;
 
     if (
       !skip ||
       !validateAsDigit(skip as string) ||
       !take ||
-      !validateAsDigit(take as string) ||
-      !entrepriseId ||
-      !validateAsDigit(entrepriseId as string)
+      !validateAsDigit(take as string)
     )
       return res.json({ message: 'params invalid' });
 
@@ -275,8 +260,8 @@ export async function searchAbonnement(req: Request, res: Response) {
         .leftJoinAndSelect('abonnements.savedBy', 'savedBy')
         .leftJoinAndSelect('abonnements.offre', 'offre')
         .where(
-          '(offre.designation like :query or savedBy.username like :query or activateBy.username like :query ) and entrepriseId = :entrepriseId',
-          { query: `%${query}%`, entrepriseId },
+          '(offre.designation like :query or savedBy.username like :query or activateBy.username like :query or entreprise.nom like :query entreprise.nom like :query or entreprise.rccm like :query or entreprise.idnat like :query or entreprise.senderName like :query or entreprise.ville like :query or entreprise.province like :query ) ',
+          { query: `%${query}%` },
         )
         .getCount();
 
@@ -287,8 +272,8 @@ export async function searchAbonnement(req: Request, res: Response) {
         .leftJoinAndSelect('abonnements.savedBy', 'savedBy')
         .leftJoinAndSelect('abonnements.offre', 'offre')
         .where(
-          '(offre.designation like :query or savedBy.username like :query or activateBy.username like :query ) and entrepriseId = :entrepriseId',
-          { query: `%${query}%`, entrepriseId },
+          '(offre.designation like :query or savedBy.username like :query or activateBy.username like :query or entreprise.nom like :query entreprise.nom like :query or entreprise.rccm like :query or entreprise.idnat like :query or entreprise.senderName like :query or entreprise.ville like :query or entreprise.province like :query ) ',
+          { query: `%${query}%` },
         )
         .take(Number.parseFloat(take as string))
         .skip(Number.parseFloat(skip as string))
