@@ -128,6 +128,8 @@ export async function saveUserByValues({
     user.niveau = niveau;
     user.comment = comment;
 
+    console.log(user);
+
     await queryRunner.manager.save(user);
 
     const acces = new Acces();
