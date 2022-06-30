@@ -21,6 +21,8 @@ import { saveRefreshToken } from './TokenController';
 import { Abonnement } from '../entity/Abonnement.entity';
 import { QueryRunner } from 'typeorm';
 import { Acces } from '../entity/Access.entity';
+import { Forfait } from '../entity/Forfait.entity';
+import { Transactions } from '../entity/Transactions.entity';
 
 export async function all(req: Request, res: Response) {
   try {
@@ -318,8 +320,13 @@ export async function changePasswordBySMS(req: IRequest, res: Response) {
     if (!username || !validateAsString(username))
       return res.json({ message: 'username est invalide' });
 
-    const tempUser = await AppDataSource.getRepository(User).findOneBy({
-      username,
+    const tempUser = await AppDataSource.getRepository(User).findOne({
+      where: { username },
+      relations: {
+        access: {
+          entreprise: true,
+        },
+      },
     });
 
     if (!tempUser) return res.json({ message: 'user not exist' });
@@ -352,19 +359,52 @@ export async function changePasswordBySMS(req: IRequest, res: Response) {
           "vous ne possède pas d'abonnement impossible  de changer votre mot de passe",
       });
 
-    if (dayjs(dayjs(Date.now())).isBefore(dayjs(abonnement.dateFin)))
+    if (
+      abonnement.statut !== 1 &&
+      !dayjs().isBefore(dayjs(abonnement.dateFin), 'day')
+    )
       return res.json({
         message:
           "vous ne possède pas d'abonnement actif impossible  de changer votre mot de passe",
       });
+
+    const forfait = await AppDataSource.getRepository(Forfait).findOne({
+      where: {
+        abonnements: {
+          id: abonnement.id,
+        },
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (!forfait)
+      return res.json({
+        message:
+          "vous ne possède pas d'abonnement actif impossible  de changer votre mot de passe",
+      });
+
+    if (forfait.initial + forfait.entree - forfait.sortie == 0)
+      return res.json({
+        message:
+          "vous ne possède pas d'abonnement actif impossible  de changer votre mot de passe",
+      });
+
     const pass = generateRandomString(8);
 
     const password = bcryptjs.hashSync(pass);
     await AppDataSource.getRepository(User).update({ username }, { password });
     await sendSMS(
       tempUser.access.entreprise.tel.replace(' ', '').replace('+', ''),
-      `Bonjour\n,votre nouveau mot de passe est : ${pass}`,
+      `Votre nouveau mot de passe est : ${pass}`,
     );
+
+    const forf = new Forfait();
+    forf.id = '' + Date.now();
+    forf.entree = 0;
+    forf.sortie = 1;
+    forf.initial = forfait.initial + forfait.entree - forfait.sortie;
+
+    await AppDataSource.getRepository(Forfait).save(forf);
 
     return res.json({ success: 'success' });
   } catch (error) {

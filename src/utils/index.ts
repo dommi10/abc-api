@@ -256,16 +256,27 @@ export async function sendSMS(
 ): Promise<boolean> {
   try {
     if (!title) title = 'Abecha';
-    const url = encodeURI(
-      `https://www.easysendsms.com/sms/bulksms-api/bulksms-api?username=${process.env.ES_USERNAME}&password=${process.env.ES_PASSWORD}&from=${title}&to=${tel}&text=${message}&type=0`,
-    );
-    const smsSender = await axios.get(url, {
-      headers: {
-        Cookie: 'ASPSESSIONIDAWRTTQDQ=AELBOALACIGEEPOBCMFMMJBG',
-      },
-    });
 
-    if (smsSender.data && smsSender.data.toString().includes('OK')) return true;
+    const smsSender = await axios.post(
+      'https://rest.clicksend.com/v3/sms/send',
+      {
+        messages: [
+          {
+            body: message,
+            to: tel,
+            from: title ? title : 'Abecha',
+          },
+        ],
+      },
+      {
+        auth: {
+          username: process.env.CLICK_USERNAME ?? '',
+          password: process.env.CLICK_PASSWORD ?? '',
+        },
+      },
+    );
+
+    if (smsSender.data && smsSender.data.http_code === 200) return true;
     return false;
   } catch (error) {
     console.log(error);

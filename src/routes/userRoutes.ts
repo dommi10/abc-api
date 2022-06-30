@@ -24,11 +24,7 @@ userRoutes.get('/search', authenticateToken, searchUser);
 userRoutes.put('/active/:id', authenticateToken, activate);
 userRoutes.put('/niveau/new/:id', authenticateToken, updateNiveau);
 userRoutes.get('/password/reset/new/:id', authenticateToken, changePassword);
-userRoutes.get(
-  '/password/reset/client/new/:username',
-  authenticateToken,
-  changePasswordBySMS,
-);
+userRoutes.get('/password/reset/client/new/:username', changePasswordBySMS);
 userRoutes.delete('/:id', authenticateToken, desactivate);
 userRoutes.get('/me', authenticateToken, me);
 export default userRoutes;

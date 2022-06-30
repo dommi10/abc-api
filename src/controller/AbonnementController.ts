@@ -219,6 +219,8 @@ export async function activate(req: IRequest, res: Response) {
     forfait.sortie = 0;
     forfait.comment = getComment(req);
 
+    await queryRunner.manager.save(forfait);
+
     const connectedUser = await AppDataSource.getRepository(
       Abonnement,
     ).findOneBy({
