@@ -64,6 +64,7 @@ export async function one(req: Request, res: Response) {
 
 export async function save(req: IRequest, res: Response) {
   const password = generateRandomString(8);
+  const cryptedPassword = await bcryptjs.hash(password, 10);
   const queryRunner = AppDataSource.createQueryRunner();
   await queryRunner.connect();
   await queryRunner.startTransaction();
@@ -166,8 +167,6 @@ export async function save(req: IRequest, res: Response) {
       else if (order >= 100 && order < 1000) username = `user-0${order}`;
       else username = `user-${order}`;
     }
-
-    const cryptedPassword = await bcryptjs.hash(password, 10);
 
     const saveUser = await saveUserByValues({
       username,
