@@ -96,8 +96,10 @@ export async function saveUserByValues({
   niveau,
   comment,
   queryRunner,
+  password,
 }: {
   username: string;
+  password: string;
   niveau: niveauType;
   comment: string;
   loggedUser: UserType;
@@ -119,7 +121,6 @@ export async function saveUserByValues({
     )
       return 'user already exists';
 
-    const password = generateRandomString(8);
     const user = new User();
     user.id = Date.now().toString();
     user.username = username.toLocaleLowerCase();

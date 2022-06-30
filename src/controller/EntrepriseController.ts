@@ -6,6 +6,7 @@ import { Entreprise } from '../entity/Entreprise.entity';
 import { niveau as niveauType, User } from '../entity/User.entity';
 import {
   formatToNumber,
+  generateRandomString,
   getComment,
   validateAsDigit,
   validateAsPhoneNumber,
@@ -62,6 +63,7 @@ export async function one(req: Request, res: Response) {
 }
 
 export async function save(req: IRequest, res: Response) {
+  const password = generateRandomString(8);
   const queryRunner = AppDataSource.createQueryRunner();
   await queryRunner.connect();
   await queryRunner.startTransaction();
@@ -149,7 +151,7 @@ export async function save(req: IRequest, res: Response) {
       order: { createdAt: 'DESC' },
     });
 
-    let username = 'user-01';
+    let username = 'user-0001';
 
     if (user) {
       const order =
@@ -171,6 +173,7 @@ export async function save(req: IRequest, res: Response) {
       niveau: niveauType.USER,
       queryRunner,
       comment: getComment(req),
+      password,
     });
 
     if (typeof saveUser === 'string') {
