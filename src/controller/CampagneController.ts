@@ -103,6 +103,15 @@ export async function save(req: IRequest, res: Response) {
         message: 'une campagne avec le meme intutilé exist déjà',
       });
 
+    const entreprise = await AppDataSource.getRepository(Entreprise).findOneBy({
+      id: entrepriseId,
+    });
+
+    if (entreprise)
+      return res.json({
+        message: 'cette entreprise est invalide',
+      });
+
     const campagne = new Campagne();
     campagne.id = Date.now().toString();
     campagne.title = (title as string).toLocaleLowerCase();
@@ -120,10 +129,6 @@ export async function save(req: IRequest, res: Response) {
       .relation(Campagne, 'savedBy')
       .of(campagne)
       .set(connectedUser);
-
-    const entreprise = await AppDataSource.getRepository(Entreprise).findOneBy({
-      id: entrepriseId,
-    });
 
     await AppDataSource.createQueryBuilder()
       .relation(Campagne, 'entreprise')
