@@ -9,6 +9,7 @@ import {
   validateAsStringForQuery,
 } from '../utils';
 import { IRequest } from '../helpers';
+import { Entreprise } from '../entity/Entreprise.entity';
 
 export async function all(req: Request, res: Response) {
   try {
@@ -120,7 +121,7 @@ export async function save(req: IRequest, res: Response) {
       .of(campagne)
       .set(connectedUser);
 
-    const entreprise = await AppDataSource.getRepository(Campagne).findOneBy({
+    const entreprise = await AppDataSource.getRepository(Entreprise).findOneBy({
       id: entrepriseId,
     });
 
