@@ -97,9 +97,11 @@ export async function saveUserByValues({
   comment,
   queryRunner,
   password,
+  cryptedPassword,
 }: {
   username: string;
   password: string;
+  cryptedPassword: string;
   niveau: niveauType;
   comment: string;
   loggedUser: UserType;
@@ -124,11 +126,9 @@ export async function saveUserByValues({
     const user = new User();
     user.id = Date.now().toString();
     user.username = username.toLocaleLowerCase();
-    user.password = bcryptjs.hashSync(password);
+    user.password = cryptedPassword;
     user.niveau = niveau;
     user.comment = comment;
-
-    console.log(user);
 
     await queryRunner.manager.save(user);
 

@@ -167,6 +167,8 @@ export async function save(req: IRequest, res: Response) {
       else username = `user-${order}`;
     }
 
+    const cryptedPassword = await bcryptjs.hash(password, 10);
+
     const saveUser = await saveUserByValues({
       username,
       loggedUser,
@@ -174,6 +176,7 @@ export async function save(req: IRequest, res: Response) {
       queryRunner,
       comment: getComment(req),
       password,
+      cryptedPassword,
     });
 
     if (typeof saveUser === 'string') {
