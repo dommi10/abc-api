@@ -8,6 +8,7 @@ import {
   formatToNumber,
   generateRandomString,
   getComment,
+  priceSMS,
   validateAsDigit,
   validateAsPhoneNumber,
   validateAsString,
@@ -17,6 +18,9 @@ import { IRequest } from '../helpers';
 import { saveUserByValues } from './UserController';
 import { Like } from 'typeorm';
 import { Acces } from '../entity/Access.entity';
+import { Abonnement } from '../entity/Abonnement.entity';
+import { Forfait } from '../entity/Forfait.entity';
+import { Campagne } from '../entity/Campagne.entity';
 
 export async function all(req: Request, res: Response) {
   try {
@@ -209,6 +213,255 @@ export async function save(req: IRequest, res: Response) {
   } finally {
     // you need to release query runner which is manually created:
     await queryRunner.release();
+  }
+}
+
+export async function sendDiffusion(req: IRequest, res: Response) {
+  const queryRunner = AppDataSource.createQueryRunner();
+  await queryRunner.connect();
+  await queryRunner.startTransaction();
+
+  try {
+    const { entrepriseId, campagneId, numbers, tel } = req.body;
+    const { user: loggedUser } = req;
+
+    if (!loggedUser || loggedUser.niveau !== niveauType.USER)
+      return res.json({
+        message:
+          "vous ne disposez pas assez d'autorisation pour effectuer cette action",
+      });
+
+    if (!entrepriseId || !validateAsDigit(entrepriseId))
+      return res.json({ message: 'entreprise invalid' });
+
+    if (!campagneId || !validateAsString(campagneId))
+      return res.json({ message: 'campagne invalide' });
+
+    if (!numbers) return res.json({ message: 'numeros invalide' });
+
+    const entreprise = await AppDataSource.getRepository(Entreprise).findOne({
+      where: {
+        id: entrepriseId,
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (!entreprise) return res.json({ message: 'entreprise non trouvée' });
+
+    const abonnement = await AppDataSource.getRepository(Abonnement).findOne({
+      where: {
+        entreprise: {
+          id: entreprise.id,
+        },
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (!abonnement)
+      return res.json({
+        message: "vous ne possède pas d'abonnement actif",
+      });
+
+    if (
+      abonnement.statut !== 1 &&
+      !dayjs().isBefore(dayjs(abonnement.dateFin), 'day')
+    )
+      return res.json({
+        message: 'votre abonnement a expiré',
+      });
+
+    const forfait = await AppDataSource.getRepository(Forfait).findOne({
+      where: {
+        abonnements: {
+          id: abonnement.id,
+        },
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (!forfait)
+      return res.json({
+        message: "vous ne possède pas d'abonnement actif",
+      });
+
+    if (forfait.initial + forfait.entree - forfait.sortie === 0)
+      return res.json({
+        message: 'vous solde est vide, pensez à vous réabonner',
+      });
+
+    const campagne = await AppDataSource.getRepository(Campagne).findOne({
+      where: {
+        id: campagneId,
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (!campagne)
+      return res.json({
+        message: "votre campagne n'est pas trouvé",
+      });
+
+    const cost = await priceSMS(campagne.message);
+
+    if (cost === -1)
+      return res.json({
+        message:
+          'impossible de faire une nouvelle campagne, reessayer plus tard',
+      });
+
+    const totalCost = cost * numbers.length;
+    const solde = forfait.initial + forfait.entree - forfait.sortie;
+
+    if (solde >= totalCost)
+      return res.json({
+        message: `vous solde est insuffisant, solde actuel : ${solde}, ce qu'il faut ${totalCost}  pensez à vous réabonner`,
+      });
+
+    const forf = new Forfait();
+    forf.id = '' + Date.now();
+    forf.entree = 0;
+    forf.sortie = totalCost;
+    forf.initial = forfait.initial + forfait.entree - forfait.sortie;
+    forf.comment = getComment(req);
+
+    await queryRunner.manager.save(forf);
+
+    await queryRunner.manager
+      .createQueryBuilder()
+      .relation(Forfait, 'abonnements')
+      .of(forfait)
+      .set(abonnement);
+
+    const connectedUser = await AppDataSource.getRepository(User).findOneBy({
+      id: loggedUser.id,
+    });
+
+    await queryRunner.manager
+      .createQueryBuilder()
+      .relation(Forfait, 'savedBy')
+      .of(forfait)
+      .set(connectedUser);
+
+    await queryRunner.commitTransaction();
+
+    return res.json({ success: 'finished' });
+  } catch (error) {
+    console.log(error);
+    await queryRunner.rollbackTransaction();
+    return res.json({ message: 'something went wrong try again' });
+  } finally {
+    // you need to release query runner which is manually created:
+    await queryRunner.release();
+  }
+}
+
+export async function createDiffusion(req: IRequest, res: Response) {
+  const queryRunner = AppDataSource.createQueryRunner();
+  await queryRunner.connect();
+  await queryRunner.startTransaction();
+
+  try {
+    const { entrepriseId, campagneId, numbers } = req.body;
+    const { user: loggedUser } = req;
+
+    if (!loggedUser || loggedUser.niveau !== niveauType.USER)
+      return res.json({
+        message:
+          "vous ne disposez pas assez d'autorisation pour effectuer cette action",
+      });
+
+    if (!entrepriseId || !validateAsDigit(entrepriseId))
+      return res.json({ message: 'entreprise invalid' });
+
+    if (!campagneId || !validateAsString(campagneId))
+      return res.json({ message: 'campagne invalide' });
+
+    if (!numbers) return res.json({ message: 'numeros invalide' });
+
+    const entreprise = await AppDataSource.getRepository(Entreprise).findOne({
+      where: {
+        id: entrepriseId,
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (!entreprise) return res.json({ message: 'entreprise non trouvée' });
+
+    const abonnement = await AppDataSource.getRepository(Abonnement).findOne({
+      where: {
+        entreprise: {
+          id: entreprise.id,
+        },
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (!abonnement)
+      return res.json({
+        message: "vous ne possède pas d'abonnement actif",
+      });
+
+    if (
+      abonnement.statut !== 1 &&
+      !dayjs().isBefore(dayjs(abonnement.dateFin), 'day')
+    )
+      return res.json({
+        message: 'votre abonnement a expiré',
+      });
+
+    const forfait = await AppDataSource.getRepository(Forfait).findOne({
+      where: {
+        abonnements: {
+          id: abonnement.id,
+        },
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (!forfait)
+      return res.json({
+        message: "vous ne possède pas d'abonnement actif",
+      });
+
+    if (forfait.initial + forfait.entree - forfait.sortie === 0)
+      return res.json({
+        message: 'vous solde est vide, pensez à vous réabonner',
+      });
+
+    const campagne = await AppDataSource.getRepository(Campagne).findOne({
+      where: {
+        id: campagneId,
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    if (!campagne)
+      return res.json({
+        message: "votre campagne n'est pas trouvé",
+      });
+
+    const cost = await priceSMS(campagne.message);
+
+    if (cost === -1)
+      return res.json({
+        message:
+          'impossible de faire une nouvelle campagne, reessayer plus tard',
+      });
+
+    const totalCost = cost * numbers.length;
+    const solde = forfait.initial + forfait.entree - forfait.sortie;
+
+    if (solde >= totalCost)
+      return res.json({
+        message: `vous solde est insuffisant, solde actuel : ${solde}, ce qu'il faut ${totalCost}  pensez à vous réabonner`,
+      });
+
+    return res.json({
+      success: `vous solde sera crédité de ${totalCost} SMS`,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.json({ message: 'something went wrong try again' });
   }
 }
 

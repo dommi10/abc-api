@@ -284,6 +284,43 @@ export async function sendSMS(
   }
 }
 
+/**
+ * Return boolean as result | true if message successfully send
+ * @param tel
+ * @param message
+ * @returns
+ */
+export async function priceSMS(message: string): Promise<number> {
+  try {
+    const smsSender = await axios.post(
+      'https://rest.clicksend.com/v3/sms/price',
+      {
+        messages: [
+          {
+            body: message,
+            to: '243971955445',
+            from: 'Abecha',
+          },
+        ],
+      },
+      {
+        auth: {
+          username: process.env.CLICK_USERNAME ?? '',
+          password: process.env.CLICK_PASSWORD ?? '',
+        },
+      },
+    );
+
+    if (smsSender.data && smsSender.data.http_code === 200) {
+      return smsSender.data.data.total_count;
+    }
+    return -1;
+  } catch (error) {
+    console.log(error);
+    return -1;
+  }
+}
+
 export const EXPIRE_ACCESS_TOKEN = '900000';
 export const EXPIRE_REFRESH_TOKEN = '30d';
 export const EXPIRE_DAILY_REFRESH_TOKEN = '1d';
