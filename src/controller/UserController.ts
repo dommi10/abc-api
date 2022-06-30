@@ -403,8 +403,15 @@ export async function changePasswordBySMS(req: IRequest, res: Response) {
     forf.entree = 0;
     forf.sortie = 1;
     forf.initial = forfait.initial + forfait.entree - forfait.sortie;
+    forf.comment = getComment(req);
 
     await AppDataSource.getRepository(Forfait).save(forf);
+
+    await AppDataSource.getRepository(Forfait)
+      .createQueryBuilder()
+      .relation(Forfait, 'abonnements')
+      .of(forfait)
+      .set(abonnement);
 
     return res.json({ success: 'success' });
   } catch (error) {
