@@ -97,7 +97,7 @@ export async function save(req: IRequest, res: Response) {
       },
     });
 
-    if (!tempUser)
+    if (tempUser)
       return res.json({
         message: 'une campagne avec le meme intutilé exist déjà',
       });
