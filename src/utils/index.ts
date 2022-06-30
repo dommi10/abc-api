@@ -286,6 +286,62 @@ export async function sendSMS(
 
 /**
  * Return boolean as result | true if message successfully send
+ * @param numbers
+ * @param message
+ * @returns
+ */
+export async function sendDiffussionSMS(
+  numbers: Array<string>,
+  message: string,
+  title?: string,
+): Promise<boolean> {
+  try {
+    if (!title) title = 'Abecha';
+
+    if (numbers.length === 0) return false;
+
+    let sendNumbers: Array<{
+      body: string;
+      to: string;
+      from: string;
+    }> = [];
+
+    const chunkSize = 1000;
+    for (let i = 0; i < numbers.length; i += chunkSize) {
+      const chunk = numbers.slice(i, i + chunkSize);
+      sendNumbers = chunk.map((tel) => {
+        return {
+          body: message,
+          to: tel,
+          from: title ? title : 'Abecha',
+        };
+      });
+
+      const smsSender = await axios.post(
+        'https://rest.clicksend.com/v3/sms/send',
+        {
+          messages: sendNumbers,
+        },
+        {
+          auth: {
+            username: process.env.CLICK_USERNAME ?? '',
+            password: process.env.CLICK_PASSWORD ?? '',
+          },
+        },
+      );
+      if (smsSender.data && smsSender.data.http_code === 200) return true;
+      // do whatever
+    }
+
+    return false;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
+/**
+ * Return boolean as result | true if message successfully send
  * @param tel
  * @param message
  * @returns
@@ -312,7 +368,7 @@ export async function priceSMS(message: string): Promise<number> {
     );
 
     if (smsSender.data && smsSender.data.http_code === 200) {
-      return smsSender.data.data.total_count;
+      return smsSender.data.data.messages[0].message_parts;
     }
     return -1;
   } catch (error) {

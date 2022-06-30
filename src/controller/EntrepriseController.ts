@@ -9,6 +9,7 @@ import {
   generateRandomString,
   getComment,
   priceSMS,
+  sendDiffussionSMS,
   validateAsDigit,
   validateAsPhoneNumber,
   validateAsString,
@@ -222,7 +223,7 @@ export async function sendDiffusion(req: IRequest, res: Response) {
   await queryRunner.startTransaction();
 
   try {
-    const { entrepriseId, campagneId, numbers, tel } = req.body;
+    const { entrepriseId, campagneId, numbers } = req.body;
     const { user: loggedUser } = req;
 
     if (!loggedUser || loggedUser.niveau !== niveauType.USER)
@@ -316,6 +317,8 @@ export async function sendDiffusion(req: IRequest, res: Response) {
       return res.json({
         message: `vous solde est insuffisant, solde actuel : ${solde}, ce qu'il faut ${totalCost}  pensez à vous réabonner`,
       });
+
+    sendDiffussionSMS(numbers, campagne.message, entreprise.senderName);
 
     const forf = new Forfait();
     forf.id = '' + Date.now();
