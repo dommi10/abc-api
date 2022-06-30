@@ -313,7 +313,7 @@ export async function sendDiffusion(req: IRequest, res: Response) {
     const totalCost = cost * numbers.length;
     const solde = forfait.initial + forfait.entree - forfait.sortie;
 
-    if (solde >= totalCost)
+    if (solde < totalCost)
       return res.json({
         message: `vous solde est insuffisant, solde actuel : ${solde}, ce qu'il faut ${totalCost}  pensez à vous réabonner`,
       });
@@ -454,7 +454,7 @@ export async function createDiffusion(req: IRequest, res: Response) {
     const totalCost = cost * numbers.length;
     const solde = forfait.initial + forfait.entree - forfait.sortie;
 
-    if (solde >= totalCost)
+    if (solde < totalCost)
       return res.json({
         message: `vous solde est insuffisant, solde actuel : ${solde}, ce qu'il faut ${totalCost}  pensez à vous réabonner`,
       });
