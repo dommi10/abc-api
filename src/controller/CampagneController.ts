@@ -94,7 +94,7 @@ export async function save(req: IRequest, res: Response) {
     const tempUser = await AppDataSource.getRepository(Campagne).findOneBy({
       title: (title as string).toLocaleLowerCase(),
       entreprise: {
-        id: entrepriseId,
+        id: entrepriseId as string,
       },
     });
 
@@ -104,10 +104,10 @@ export async function save(req: IRequest, res: Response) {
       });
 
     const entreprise = await AppDataSource.getRepository(Entreprise).findOneBy({
-      id: entrepriseId,
+      id: entrepriseId as string,
     });
 
-    if (entreprise)
+    if (!entreprise)
       return res.json({
         message: 'cette entreprise est invalide',
       });
