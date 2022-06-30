@@ -92,6 +92,9 @@ export async function save(req: IRequest, res: Response) {
 
     const tempUser = await AppDataSource.getRepository(Campagne).findOneBy({
       title: (title as string).toLocaleLowerCase(),
+      entreprise: {
+        id: entrepriseId,
+      },
     });
 
     if (!tempUser)
