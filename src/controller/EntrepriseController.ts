@@ -17,11 +17,59 @@ import {
 } from '../utils';
 import { IRequest } from '../helpers';
 import { saveUserByValues } from './UserController';
-import { Like } from 'typeorm';
+import { Like, MoreThan } from 'typeorm';
 import { Acces } from '../entity/Access.entity';
 import { Abonnement } from '../entity/Abonnement.entity';
 import { Forfait } from '../entity/Forfait.entity';
 import { Campagne } from '../entity/Campagne.entity';
+
+export async function dash(req: Request, res: Response) {
+  try {
+    const { entrepriseId } = req.query;
+
+    if (!entrepriseId || !validateAsDigit(entrepriseId as string))
+      return res.json({ message: 'params invalid' });
+    const forfait = await AppDataSource.getRepository(Forfait).findOne({
+      where: {
+        abonnements: {
+          entreprise: {
+            id: entrepriseId as string,
+          },
+        },
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    const forfaitTotal = await AppDataSource.getRepository(Forfait).findOne({
+      where: {
+        sortie: MoreThan(0),
+        abonnements: {
+          entreprise: {
+            id: entrepriseId as string,
+          },
+        },
+      },
+      order: { createdAt: 'DESC' },
+    });
+
+    const forfaitTotalPayer = await AppDataSource.getRepository(Forfait).query(
+      'SELECT COALESCE(SUM(f.entree),0) as total FROM forfait f where f.entree > 0 and f.abonnementid in (select id from abonnement where entrepriseId = ?)',
+      [entrepriseId],
+    );
+
+    return res.json({
+      solde: forfait ? forfait.initial + forfait.entree - forfait.sortie : 0,
+      last: forfaitTotal ? forfaitTotal.sortie : 0,
+      total:
+        forfaitTotalPayer && forfaitTotalPayer.length > 0
+          ? forfaitTotalPayer[0].total
+          : -1,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.json({ message: 'Something went wrong, please try again' });
+  }
+}
 
 export async function all(req: Request, res: Response) {
   try {
