@@ -88,8 +88,7 @@ export async function save(req: IRequest, res: Response) {
     if (!title || !validateAsString(title))
       return res.json({ message: 'title invalid' });
 
-    if (!message || !validateAsString(message))
-      return res.json({ message: 'message incorrect' });
+    if (!message) return res.json({ message: 'message incorrect' });
 
     const tempUser = await AppDataSource.getRepository(Campagne).findOneBy({
       title: (title as string).toLocaleLowerCase(),
