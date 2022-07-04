@@ -368,7 +368,9 @@ export async function priceSMS(message: string): Promise<number> {
     );
 
     if (smsSender.data && smsSender.data.http_code === 200) {
-      return smsSender.data.data.messages[0].message_parts;
+      return Number.parseFloat(
+        '' + smsSender.data.data.messages[0].message_parts,
+      );
     }
     return -1;
   } catch (error) {

@@ -402,7 +402,10 @@ export async function changePasswordBySMS(req: IRequest, res: Response) {
     forf.id = '' + Date.now();
     forf.entree = 0;
     forf.sortie = 1;
-    forf.initial = forfait.initial + forfait.entree - forfait.sortie;
+    forf.initial =
+      Number.parseFloat('' + forfait.initial) +
+      Number.parseFloat('' + forfait.entree) -
+      Number.parseFloat('' + forfait.sortie);
     forf.comment = getComment(req);
 
     await AppDataSource.getRepository(Forfait).save(forf);

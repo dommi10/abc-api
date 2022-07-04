@@ -58,8 +58,12 @@ export async function dash(req: Request, res: Response) {
     );
 
     return res.json({
-      solde: forfait ? forfait.initial + forfait.entree - forfait.sortie : 0,
-      last: forfaitTotal ? forfaitTotal.sortie : 0,
+      solde: forfait
+        ? Number.parseFloat('' + forfait.initial) +
+          Number.parseFloat('' + forfait.entree) -
+          Number.parseFloat('' + forfait.sortie)
+        : 0,
+      last: forfaitTotal ? Number.parseFloat('' + forfaitTotal.sortie) : 0,
       total:
         forfaitTotalPayer && forfaitTotalPayer.length > 0
           ? Number.parseFloat(forfaitTotalPayer[0].total)
@@ -359,7 +363,10 @@ export async function sendDiffusion(req: IRequest, res: Response) {
       });
 
     const totalCost = cost * numbers.length;
-    const solde = forfait.initial + forfait.entree - forfait.sortie;
+    const solde =
+      Number.parseFloat('' + forfait.initial) +
+      Number.parseFloat('' + forfait.entree) -
+      Number.parseFloat('' + forfait.sortie);
 
     if (solde < totalCost)
       return res.json({
@@ -372,7 +379,10 @@ export async function sendDiffusion(req: IRequest, res: Response) {
     forf.id = '' + Date.now();
     forf.entree = 0;
     forf.sortie = totalCost;
-    forf.initial = forfait.initial + forfait.entree - forfait.sortie;
+    forf.initial =
+      Number.parseFloat('' + forfait.initial) +
+      Number.parseFloat('' + forfait.entree) -
+      Number.parseFloat('' + forfait.sortie);
     forf.comment = getComment(req);
 
     await queryRunner.manager.save(forf);
@@ -500,7 +510,10 @@ export async function createDiffusion(req: IRequest, res: Response) {
       });
 
     const totalCost = cost * numbers.length;
-    const solde = forfait.initial + forfait.entree - forfait.sortie;
+    const solde =
+      Number.parseFloat('' + forfait.initial) +
+      Number.parseFloat('' + forfait.entree) -
+      Number.parseFloat('' + forfait.sortie);
 
     if (solde < totalCost)
       return res.json({
