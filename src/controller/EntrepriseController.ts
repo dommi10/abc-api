@@ -53,7 +53,7 @@ export async function dash(req: Request, res: Response) {
     });
 
     const forfaitTotalPayer = await AppDataSource.getRepository(Forfait).query(
-      'SELECT COALESCE(SUM(f.entree),0) as total FROM forfait f where f.entree > 0 and f.abonnementid in (select id from abonnement where entrepriseId = ?)',
+      'SELECT COALESCE(SUM(f.entree),0) as total FROM forfait f where f.entree > 0 and f.abonnementsId in (select id from abonnement where entrepriseId = ?)',
       [entrepriseId],
     );
 
