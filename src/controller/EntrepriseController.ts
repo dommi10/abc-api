@@ -62,7 +62,7 @@ export async function dash(req: Request, res: Response) {
       last: forfaitTotal ? forfaitTotal.sortie : 0,
       total:
         forfaitTotalPayer && forfaitTotalPayer.length > 0
-          ? forfaitTotalPayer[0].total
+          ? Number.parseFloat(forfaitTotalPayer[0].total)
           : -1,
     });
   } catch (error) {
@@ -380,7 +380,7 @@ export async function sendDiffusion(req: IRequest, res: Response) {
     await queryRunner.manager
       .createQueryBuilder()
       .relation(Forfait, 'abonnements')
-      .of(forfait)
+      .of(forf)
       .set(abonnement);
 
     const connectedUser = await AppDataSource.getRepository(User).findOneBy({
@@ -390,7 +390,7 @@ export async function sendDiffusion(req: IRequest, res: Response) {
     await queryRunner.manager
       .createQueryBuilder()
       .relation(Forfait, 'savedBy')
-      .of(forfait)
+      .of(forf)
       .set(connectedUser);
 
     await queryRunner.commitTransaction();
