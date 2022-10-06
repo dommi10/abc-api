@@ -26,3 +26,5 @@ jobs:
           HD_WEB3_STORAGE_TOKEN: ${{secrets.WEB3_STORAGE_TOKEN}}
           HD_CLICK_PASSWORD: ${{secrets.CLICK_PASSWORD}}
           HD_CLICK_USERNAME: ${{secrets.CLICK_USERNAME}}
+          HD_ES_PASSWORD: ${{secrets.ES_PASSWORD}}
+          HD_ES_USERNAME: ${{secrets.ES_USERNAME}}
