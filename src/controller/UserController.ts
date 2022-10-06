@@ -394,7 +394,7 @@ export async function changePasswordBySMS(req: IRequest, res: Response) {
     const password = bcryptjs.hashSync(pass);
     await AppDataSource.getRepository(User).update({ username }, { password });
     await sendSMS(
-      tempUser.access.entreprise.tel.replace(' ', '').replace('+', ''),
+      [tempUser.access.entreprise.tel.replace(' ', '').replace('+', '')],
       `Votre nouveau mot de passe est : ${pass}`,
     );
 
