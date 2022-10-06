@@ -42,8 +42,7 @@ AppDataSource.initialize()
     app.use('/campagne', campagneRoutes.default);
     app.use('/abonnement', abonnementRoutes.default);
 
-    // setup express app here
-    // ...
+    // setup express app here.
     app.get('/', (_req: Request, res: Response) => {
       return res.json({ message: 'welcome' });
     });
