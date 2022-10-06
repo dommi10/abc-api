@@ -250,33 +250,28 @@ export function generateRandomString(length: number): string {
  * @returns
  */
 export async function sendSMS(
-  tel: string,
+  numbers: Array<string>,
   message: string,
   title?: string,
 ): Promise<boolean> {
   try {
     if (!title) title = 'Abecha';
+    const smsApi = {
+      username: process.env.ES_USERNAME,
+      psswd: process.env.ES_PASSWORD,
+      from: title,
+      to: numbers.join(),
+      message,
+      type: 0,
+    };
 
     const smsSender = await axios.post(
-      'https://rest.clicksend.com/v3/sms/send',
-      {
-        messages: [
-          {
-            body: message,
-            to: tel,
-            from: title ? title : 'Abecha',
-          },
-        ],
-      },
-      {
-        auth: {
-          username: process.env.CLICK_USERNAME ?? '',
-          password: process.env.CLICK_PASSWORD ?? '',
-        },
-      },
+      encodeURI(
+        `https://www.easysendsms.com/sms/bulksms-api/bulksms-api?username=${smsApi.username}&password=${smsApi.psswd}&from=${smsApi.from}&to=${smsApi.to}&text=${message}&type=${smsApi.type}`,
+      ),
     );
 
-    if (smsSender.data && smsSender.data.http_code === 200) return true;
+    if (smsSender.data.includes('OK')) return true;
     return false;
   } catch (error) {
     console.log(error);
@@ -299,6 +294,8 @@ export async function sendDiffussionSMS(
     if (!title) title = 'Abecha';
 
     if (numbers.length === 0) return false;
+
+    return await sendSMS(numbers, message, title);
 
     let sendNumbers: Array<{
       body: string;
